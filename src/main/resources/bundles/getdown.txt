@@ -1,0 +1,24 @@
+# The URL from which the client is downloaded
+version = ${cfg.version}
+appbase = ${cfg.urlbase}/%VERSION%
+${cfg.checklatest ? 'latest = ' + cfg.urlbase +'/latest-getdown.txt' : ''}
+
+# UI Configuration
+ui.name = ${cfg.title}
+${cfg.shortcuts.inject(''){ acc, val -> acc + '\nui.icon = ' + val}}
+
+# Resources for UI
+${cfg.shortcuts.inject(''){ acc, val -> acc + '\nresource = ' + val}}
+
+# Application jar files
+${project.fileTree(dir: cfg.destApp.toString() +'/lib').getFiles().inject('') { acc, val ->  acc + '\ncode = lib/' + val.getName()}}
+
+# The main entry point for the application
+class = ${cfg.mainClassName}
+
+jvmarg = -Djava.library.path=%APPDIR%/native
+jvmarg = -Dappdir=%APPDIR%
+${cfg.jvmArgs.inject('') { acc, val ->  acc + '\njvmarg = ' + val}}
+
+java_min_version = ${JreTools.toGetdownFormat(cfg.jreVersion)}
+${cfg.platforms.inject('') {acc, val -> acc + val.systems.inject('') {acc2, val2 -> acc2 + '\njava_location= [' + val2 + '] ../jres/' + JreTools.findJreJarName(cfg.jreVersion, val)}}}
